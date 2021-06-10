@@ -56,12 +56,12 @@
 
 ## 👩🏻‍💻 Back-end Work Details
 ### 백승찬
-- 'users'
+- `users`
     - FindIdView 기능 구현
     - FindPasswordView 기능 구현
     - ReviewView 기능 구현
     - UserLikeView 기능 구현
-- 'products'
+- `products`
     - CategoryView 기능 구현
     - ProductListView 기능 구현
     - SearchView 기능 구현
