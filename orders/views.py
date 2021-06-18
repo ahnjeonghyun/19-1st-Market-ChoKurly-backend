@@ -63,7 +63,7 @@ class OrderDetailView(View):
                 'products_thumbnail':order.cart_set.first().product.thumbnail_image,
                 }for order in orders]
 
-            return JsonResponse({'result':result}, status=200)
+            return JsonResponse({'result':result}, status=201)
 
         return JsonResponse({'MESSAGE':False}, status=400)
 
@@ -142,7 +142,7 @@ class BasketView(View):
         except json.JSONDecodeError:
             return JsonResponse({'message':'JSON_Decode_Error'}, status=400)
         
-        return JsonResponse({'message' : 'SUCCESS'}, status=200)
+        return JsonResponse({'message' : 'SUCCESS'}, status=201)
 
 class BasketAddressView(View):
     @login_required
@@ -196,4 +196,4 @@ class BasketQuantityView(View):
         except json.JSONDecodeError:
             return JsonResponse({'message':'JSON_Decode_Error'}, status=400)
  
-        return JsonResponse({'message':'SUCCESS'}, status=200)
+        return JsonResponse({'message':'SUCCESS'}, status=201)
