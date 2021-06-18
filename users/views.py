@@ -24,8 +24,8 @@ class FindIdView(View):
     def post(self, request):
 
         try:
-            data = json.loads(request.body)
-            name = data['name']
+            data  = json.loads(request.body)
+            name  = data['name']
             email = data['email']
 
             if not my_settings.EMAIL_CHECK.match(email):
@@ -47,16 +47,16 @@ class FindIdView(View):
 class UserView(View):
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            LENGTH = 0
+            data           = json.loads(request.body)
+            LENGTH         = 0
             identification = data['id']
-            password = data['password']
-            name = data['name']
-            email = data['email']
-            phone_number = data['phone_number']
-            birth_date = data['birthdate']
-            gender = data['gender']
-            address = data['address']
+            password       = data['password']
+            name           = data['name']
+            email          = data['email']
+            phone_number   = data['phone_number']
+            birth_date     = data['birthdate']
+            gender         = data['gender']
+            address        = data['address']
 
             if len(name) <= LENGTH:
                 return JsonResponse({'MESSAGE': 'NAME_ERRROR'}, status=400)
@@ -93,23 +93,23 @@ class UserView(View):
 
             with transaction.atomic():
                 hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-                user = User.objects.create(
-                    identification=identification,
-                    password=hashed_pw.decode('utf-8'),
-                    name=name,
-                    email=email,
-                    phone_number=phone_number,
-                    birthdate=birth_date,
-                    gender=gender)
+                user      = User.objects.create(
+                    identification = identification,
+                    password       = hashed_pw.decode('utf-8'),
+                    name           = name,
+                    email          = email,
+                    phone_number   = phone_number,
+                    birthdate      = birth_date,
+                    gender         = gender)
 
                 user_address = Address.objects.create(
-                    address=address,
-                    user=user,
-                    is_default=data['is_defalut'])
+                    address    = address,
+                    user       = user,
+                    is_default = data['is_defalut'])
 
                 user_address.save()
 
-                return JsonResponse({'MESSAGE': 'SUCCESS'}, status=200)
+                return JsonResponse({'MESSAGE': 'SUCCESS'}, status=201)
 
         except KeyError:
             return JsonResponse({'MESSAGE': 'KEY_ERROR'}, status=400)
@@ -130,9 +130,9 @@ class FindPasswordView(View):
         auth_num = self.random_choices()
 
         try:
-            name = data['name']
+            name           = data['name']
             identification = data['identification']
-            email = data['email']
+            email          = data['email']
 
             if not User.objects.filter(Q(name=name) & Q(identification=identification) & Q(email=email)).exists():
                 return JsonResponse({'MESSAGE':'INVALID_USER'}, status=400)
@@ -180,9 +180,9 @@ class SignupCheckView(View):
             identification      = data.get('id','')
 
             if not User.objects.filter(Q(identification = identification)| Q(email = email)).exists():
-                return JsonResponse({'MESSAGE':True}, status=200)
+                return JsonResponse({'MESSAGE':True}, status = 200)
                 
-            return JsonResponse({'MESSAGE':False}, status=200)
+            return JsonResponse({'MESSAGE':False}, status = 200)
 
         except KeyError:
             return JsonResponse({'MESSAGE':'KEY_ERROR'}, status=400)
@@ -196,16 +196,16 @@ class ReviewView(View):
             data   = json.loads(request.body)
             review = data['review']
             user   = request.user
-            orders = user.order_set.filter(order_status_id=3)
+            orders = user.order_set.filter(order_status_id = 3)
 
             if not product_id or not Product.objects.filter(id=product_id).exists():
-                return JsonResponse({'MESSAGE':'PRODUCT_DOES_NOT_EXIST'},status=400)
+                return JsonResponse({'MESSAGE':'PRODUCT_DOES_NOT_EXIST'},status = 400)
 
             if not review:
-                return JsonResponse({'MESSAGE':'INVALID_REVIEW'},status=400)
+                return JsonResponse({'MESSAGE':'INVALID_REVIEW'},status = 400)
 
             if not orders:
-                return JsonResponse({'MESSAGE':'INVALID_USER'},status=400)
+                return JsonResponse({'MESSAGE':'INVALID_USER'},status = 400)
 
             for order in orders:
                 if order.cart_set.filter(product_id=product_id).exists():
@@ -213,7 +213,7 @@ class ReviewView(View):
                     break
 
             if not result:
-                return JsonResponse({'MESSAGE':'INVALID_USER'}, status=400)
+                return JsonResponse({'MESSAGE':'INVALID_USER'}, status = 400)
 
             Review.objects.create(
                 user   = user,
@@ -221,20 +221,20 @@ class ReviewView(View):
                 order  = order
             )
 
-            return JsonResponse({'MESSAGE':'SUCCESS'},status=200)
+            return JsonResponse({'MESSAGE':'SUCCESS'},status = 201)
 
         except json.JSONDecodeError:
-            return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status=400)
+            return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status = 400)
 
         except KeyError:
-            return JsonResponse({'MESSAGE': 'KEY_ERROR'}, status=400)
+            return JsonResponse({'MESSAGE': 'KEY_ERROR'}, status = 400)
 
     def get(self,request,product_id=None):
 
         if not product_id or not Product.objects.filter(id=product_id).exists():
-            return JsonResponse({'MESSAGE': 'PRODUCT_DOES_NOT_EXIST'}, status=400)
+            return JsonResponse({'MESSAGE': 'PRODUCT_DOES_NOT_EXIST'}, status = 400)
 
-        reviews = Review.objects.filter(product_id=product_id)
+        reviews = Review.objects.filter(product_id = product_id)
 
         results = [
             {
@@ -244,14 +244,14 @@ class ReviewView(View):
 
             } for review in reviews]
 
-        return JsonResponse({'RESULTS':results}, status=200)
+        return JsonResponse({'RESULTS':results}, status = 200)
 
     @login_required
-    def delete(self,request,product_id=None):
+    def delete(self,request,product_id = None):
 
         try:
             if not product_id or not Product.objects.filter(id=product_id).exists():
-                return JsonResponse({'MESSAGE': 'PRODUCT_DOES_NOT_EXIST'}, status=400)
+                return JsonResponse({'MESSAGE': 'PRODUCT_DOES_NOT_EXIST'}, status = 400)
 
             data         = json.loads(request.body)
             review_id    = data['review_id']
@@ -259,14 +259,14 @@ class ReviewView(View):
             review_check = Review.objects.filter(id=review_id, user=user).exists()
 
             if not review_check:
-                return JsonResponse({'MESSAGE':'INVALID_REQUEST'}, status=400)
+                return JsonResponse({'MESSAGE':'INVALID_REQUEST'}, status = 400)
 
             Review.objects.filter(id=review_id, user=user).delete()
 
-            return JsonResponse({'MESSAGE': 'SUCCESS'}, status=200)
+            return JsonResponse({'MESSAGE': 'SUCCESS'}, status = 200)
 
         except json.JSONDecodeError:
-            return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status=400)
+            return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status = 400)
 
 class UserLikeView(View):
     @login_required
@@ -274,10 +274,10 @@ class UserLikeView(View):
         product_id = request.GET.get('product_id')
 
         if not product_id:
-            return JsonResponse({'MESSAGE':'INVALID_PRODUCT_ID'}, status=400)
+            return JsonResponse({'MESSAGE':'INVALID_PRODUCT_ID'}, status = 400)
 
         user = request.user
-        like, like_check = UserLike.objects.get_or_create(user=user,product=product_id)
+        like, like_check = UserLike.objects.get_or_create(user = user,product = product_id)
 
         if not like_check:
             if like.is_like:
@@ -286,6 +286,6 @@ class UserLikeView(View):
                 like.is_like = True
 
         like.save()
-        total = UserLike.objects.filter(product=product_id, is_like=True).count()
+        total = UserLike.objects.filter(product = product_id, is_like = True).count()
 
-        return JsonResponse({'RESULTS': total}, status=200)
+        return JsonResponse({'RESULTS': total}, status = 200)
