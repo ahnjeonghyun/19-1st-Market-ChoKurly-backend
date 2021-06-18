@@ -263,7 +263,7 @@ class ReviewView(View):
 
             Review.objects.filter(id=review_id, user=user).delete()
 
-            return JsonResponse({'MESSAGE': 'SUCCESS'}, status = 200)
+            return JsonResponse({'MESSAGE': 'SUCCESS'}, status = 204)
 
         except json.JSONDecodeError:
             return JsonResponse({'MESSAGE':'JSON_DECODE_ERROR'}, status = 400)
